@@ -1,0 +1,52 @@
+# SEZER AI Hospital Translation Template
+# Copyright (C) 2024 SEZER AI Health
+msgid ""
+msgstr ""
+"Project-Id-Version: SEZER AI Hospital 1.0.0\n"
+"Report-Msgid-Bugs-To: support@sezeraihealth.com\n"
+"POT-Creation-Date: 2024-07-12 12:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Doctor"
+msgstr ""
+
+msgid "Patient"
+msgstr ""
+
+msgid "Hospital Administrator"
+msgstr ""
+
+msgid "SEZER AI Hospital"
+msgstr ""
+
+msgid "AI Hospital"
+msgstr ""
+
+msgid "Book an Appointment"
+msgstr ""
+
+msgid "Select Doctor"
+msgstr ""
+
+msgid "Choose a doctor..."
+msgstr ""
+
+msgid "Preferred Date"
+msgstr ""
+
+msgid "Notes"
+msgstr ""
+
+msgid "Book Appointment"
+msgstr ""
+
+msgid "Our Doctors"
+msgstr ""
+
+msgid "%s Dashboard"
+msgstr ""
+
+msgid "Welcome to your dashboard!"
+msgstr ""

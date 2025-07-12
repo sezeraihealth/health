@@ -1,0 +1,62 @@
+/* SEZER AI Hospital Public Styles */
+
+.sezer-appointment-form,
+.sezer-doctor-list {
+    max-width: 600px;
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #f9f9f9;
+}
+
+.sezer-appointment-form h3,
+.sezer-doctor-list h3 {
+    margin-top: 0;
+    color: #333;
+    border-bottom: 2px solid #0073aa;
+    padding-bottom: 10px;
+}
+
+.sezer-appointment-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.sezer-appointment-form input,
+.sezer-appointment-form select,
+.sezer-appointment-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.sezer-appointment-form button {
+    background: #0073aa;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.sezer-appointment-form button:hover {
+    background: #005a87;
+}
+
+.sezer-dashboard {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.sezer-dashboard h1 {
+    color: #333;
+    border-bottom: 3px solid #0073aa;
+    padding-bottom: 10px;
+}
