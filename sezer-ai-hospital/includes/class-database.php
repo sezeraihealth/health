@@ -217,4 +217,100 @@ class SezerAIHospital_Database {
         
         return true;
     }
+    
+    public function query($sql, $params = array()) {
+        if (!$this->is_connected()) {
+            return false;
+        }
+        
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            error_log('SEZER AI Hospital Query Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    public function insert($table, $data) {
+        if (!$this->is_connected()) {
+            return false;
+        }
+        
+        try {
+            $columns = implode(', ', array_keys($data));
+            $placeholders = ':' . implode(', :', array_keys($data));
+            
+            $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+            $stmt = $this->pdo->prepare($sql);
+            
+            foreach ($data as $key => $value) {
+                $stmt->bindValue(":{$key}", $value);
+            }
+            
+            $stmt->execute();
+            return $this->pdo->lastInsertId();
+            
+        } catch (PDOException $e) {
+            error_log('SEZER AI Hospital Insert Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    public function update($table, $data, $where, $where_params = array()) {
+        if (!$this->is_connected()) {
+            return false;
+        }
+        
+        try {
+            $set_clause = array();
+            foreach ($data as $key => $value) {
+                $set_clause[] = "{$key} = :{$key}";
+            }
+            
+            $sql = "UPDATE {$table} SET " . implode(', ', $set_clause) . " WHERE {$where}";
+            $stmt = $this->pdo->prepare($sql);
+            
+            // Bind data parameters
+            foreach ($data as $key => $value) {
+                $stmt->bindValue(":{$key}", $value);
+            }
+            
+            // Bind where parameters
+            foreach ($where_params as $key => $value) {
+                $stmt->bindValue(":{$key}", $value);
+            }
+            
+            $stmt->execute();
+            return $stmt->rowCount();
+            
+        } catch (PDOException $e) {
+            error_log('SEZER AI Hospital Update Error: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    public function get_count($table, $where = '', $count_field = '*') {
+        if (!$this->is_connected()) {
+            return 0;
+        }
+        
+        try {
+            $sql = "SELECT COUNT({$count_field}) as count FROM {$table}";
+            if (!empty($where)) {
+                $sql .= " WHERE {$where}";
+            }
+            
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            $result = $stmt->fetch();
+            
+            return (int) $result['count'];
+            
+        } catch (PDOException $e) {
+            error_log('SEZER AI Hospital Count Error: ' . $e->getMessage());
+            return 0;
+        }
+    }
 }
