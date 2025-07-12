@@ -5,9 +5,12 @@
  * @package SezerAIHospital
  */
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+// Prevent direct access (allow for testing outside WordPress)
+if (!defined('ABSPATH') && !defined('SEZER_AI_HOSPITAL_PLUGIN_DIR')) {
+    // If neither WordPress nor plugin constants are defined, we're likely in a test environment
+    if (php_sapi_name() !== 'cli') {
+        exit;
+    }
 }
 
 class SezerAIHospital_EnvLoader {
@@ -23,7 +26,15 @@ class SezerAIHospital_EnvLoader {
     }
     
     private static function load_env_file() {
-        $env_file = SEZER_AI_HOSPITAL_PLUGIN_DIR . '.env';
+        // Determine the plugin directory
+        if (defined('SEZER_AI_HOSPITAL_PLUGIN_DIR')) {
+            $plugin_dir = SEZER_AI_HOSPITAL_PLUGIN_DIR;
+        } else {
+            // Fallback for testing - assume we're in the plugin directory
+            $plugin_dir = dirname(dirname(__FILE__)) . '/';
+        }
+        
+        $env_file = $plugin_dir . '.env';
         
         if (!file_exists($env_file)) {
             return;

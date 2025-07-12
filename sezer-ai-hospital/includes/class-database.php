@@ -5,9 +5,12 @@
  * @package SezerAIHospital
  */
 
-// Prevent direct access
-if (!defined('ABSPATH')) {
-    exit;
+// Prevent direct access (allow for testing outside WordPress)
+if (!defined('ABSPATH') && !defined('SEZER_AI_HOSPITAL_PLUGIN_DIR')) {
+    // If neither WordPress nor plugin constants are defined, we're likely in a test environment
+    if (php_sapi_name() !== 'cli') {
+        exit;
+    }
 }
 
 class SezerAIHospital_Database {
@@ -28,31 +31,55 @@ class SezerAIHospital_Database {
     }
     
     private function connect() {
-        try {
-            $host = SezerAIHospital_EnvLoader::get('DB_HOST', 'localhost');
-            $port = SezerAIHospital_EnvLoader::get('DB_PORT', '5432');
-            $dbname = SezerAIHospital_EnvLoader::get('DB_NAME', '');
-            $user = SezerAIHospital_EnvLoader::get('DB_USER', '');
-            $password = SezerAIHospital_EnvLoader::get('DB_PASSWORD', '');
-            
-            if (empty($dbname) || empty($user)) {
-                error_log('SEZER AI Hospital: Database credentials not configured');
+        $host = SezerAIHospital_EnvLoader::get('DB_HOST', 'localhost');
+        $port = SezerAIHospital_EnvLoader::get('DB_PORT', '5432');
+        $dbname = SezerAIHospital_EnvLoader::get('DB_NAME', '');
+        $user = SezerAIHospital_EnvLoader::get('DB_USER', '');
+        $password = SezerAIHospital_EnvLoader::get('DB_PASSWORD', '');
+        
+        if (empty($dbname) || empty($user)) {
+            error_log('SEZER AI Hospital: Database credentials not configured');
+            return;
+        }
+        
+        $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};connect_timeout=25";
+        $options = array(
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+            PDO::ATTR_TIMEOUT => 25,
+            PDO::ATTR_PERSISTENT => false, // Disable persistent connections for better reliability
+        );
+        
+        // Retry connection up to 3 times for network reliability
+        $max_retries = 3;
+        $retry_delay = 1; // seconds
+        
+        for ($attempt = 1; $attempt <= $max_retries; $attempt++) {
+            try {
+                $this->pdo = new PDO($dsn, $user, $password, $options);
+                $this->connected = true;
+                
+                // Test the connection with a simple query
+                $this->pdo->query('SELECT 1');
+                
+                if ($attempt > 1) {
+                    error_log("SEZER AI Hospital: Database connected successfully on attempt {$attempt}");
+                }
+                
                 return;
+                
+            } catch (PDOException $e) {
+                $this->connected = false;
+                
+                if ($attempt < $max_retries) {
+                    error_log("SEZER AI Hospital: Database connection attempt {$attempt} failed, retrying in {$retry_delay}s: " . $e->getMessage());
+                    sleep($retry_delay);
+                    $retry_delay *= 2; // Exponential backoff
+                } else {
+                    error_log('SEZER AI Hospital Database Error (final attempt): ' . $e->getMessage());
+                }
             }
-            
-            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname}";
-            
-            $this->pdo = new PDO($dsn, $user, $password, array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES => false,
-            ));
-            
-            $this->connected = true;
-            
-        } catch (PDOException $e) {
-            error_log('SEZER AI Hospital Database Error: ' . $e->getMessage());
-            $this->connected = false;
         }
     }
     
